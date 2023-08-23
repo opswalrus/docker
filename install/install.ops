@@ -1,0 +1,14 @@
+imports:
+  core: core
+...
+
+case core.os()
+in {base_os: /arch/}
+  puts "install arch"
+in {base_os: /debian|ubuntu/}
+  debian()
+in {base_os: /fedora/}
+  puts "install fedora"
+else
+  puts "unknown"
+end
