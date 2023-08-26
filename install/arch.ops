@@ -1,0 +1,10 @@
+core.pkg.update_repo!()
+
+puts "Install Docker Engine"
+core.pkg.install!(package: 'docker')
+
+puts "Start docker"
+core.systemd.start(service: 'docker')
+core.systemd.enable(service: 'docker')
+
+sh("Verify Docker Engine works") { 'sudo docker run hello-world' }

@@ -31,4 +31,8 @@ puts "Install Docker Engine"
 core.pkg.install!(package: %w(docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin))
 # sh("Install Docker Engine") { 'sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin' }
 
+puts "Start docker"
+core.systemd.start(service: 'docker')
+core.systemd.enable(service: 'docker')
+
 sh("Verify Docker Engine works") { 'sudo docker run hello-world' }
