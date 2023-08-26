@@ -11,4 +11,45 @@ puts "Start docker"
 core.systemd.start(service: 'docker')
 core.systemd.enable(service: 'docker')
 
+# NOTE: while testing this against arch in vagrant, I discovered the following:
+# Aug 26 16:24:25 arch.localdomain dockerd[27837]: time="2023-08-26T16:24:25.894767762Z" level=info msg="Starting up"
+# Aug 26 16:24:25 arch.localdomain dockerd[27837]: time="2023-08-26T16:24:25.904256188Z" level=error msg="failed to mount overlay: no such device" storage-driver=overlay2
+# Aug 26 16:24:25 arch.localdomain dockerd[27837]: time="2023-08-26T16:24:25.904296633Z" level=error msg="exec: \"fuse-overlayfs\": executable file not found in $PATH" storage-driver=fuse-overlayfs
+# Aug 26 16:24:25 arch.localdomain dockerd[27837]: time="2023-08-26T16:24:25.904416421Z" level=info msg="Loading containers: start."
+# Aug 26 16:24:25 arch.localdomain dockerd[27837]: time="2023-08-26T16:24:25.905423367Z" level=warning msg="Running modprobe bridge br_netfilter failed with message: modprobe: WARNING: Module bridge not found in directory /lib/modules/6.2.8-arch1-1>
+# Aug 26 16:24:25 arch.localdomain dockerd[27837]: time="2023-08-26T16:24:25.908738582Z" level=info msg="unable to detect if iptables supports xlock: 'iptables --wait -L -n': `iptables v1.8.9 (legacy): can't initialize iptables table `filter': Tabl>
+# Aug 26 16:24:25 arch.localdomain dockerd[27837]: failed to start daemon: Error initializing network controller: error obtaining controller instance: failed to create NAT chain DOCKER: iptables failed: iptables -t nat -N DOCKER: iptables v1.8.9 (l>
+# Aug 26 16:24:25 arch.localdomain dockerd[27837]: Perhaps iptables or your kernel needs to be upgraded.
+# Aug 26 16:24:25 arch.localdomain dockerd[27837]:  (exit status 3)
+# Aug 26 16:24:25 arch.localdomain systemd[1]: docker.service: Main process exited, code=exited, status=1/FAILURE
+#
+# So, I followed the advice captured in https://superuser.com/questions/1333117/iptables-kernel-module-in-stock-arch:
+# I ran `sudo pacman -S linux`, rebooted, and then it started up just fine:
+#
+# [vagrant@arch ~]$ sudo systemctl start docker
+# [sudo] password for vagrant:
+# [vagrant@arch ~]$ sudo systemctl status docker
+# ● docker.service - Docker Application Container Engine
+#      Loaded: loaded (/usr/lib/systemd/system/docker.service; enabled; preset: disabled)
+#      Active: active (running) since Sat 2023-08-26 16:28:52 UTC; 21s ago
+# TriggeredBy: ● docker.socket
+#        Docs: https://docs.docker.com
+#    Main PID: 325 (dockerd)
+#       Tasks: 9
+#      Memory: 100.6M
+#         CPU: 141ms
+#      CGroup: /system.slice/docker.service
+#              └─325 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+
+# Aug 26 16:28:51 arch.localdomain systemd[1]: Starting Docker Application Container Engine...
+# Aug 26 16:28:51 arch.localdomain dockerd[325]: time="2023-08-26T16:28:51.903185542Z" level=info msg="Starting up"
+# Aug 26 16:28:51 arch.localdomain dockerd[325]: time="2023-08-26T16:28:51.924533185Z" level=info msg="Loading containers: start."
+# Aug 26 16:28:52 arch.localdomain dockerd[325]: time="2023-08-26T16:28:52.046913595Z" level=info msg="Loading containers: done."
+# Aug 26 16:28:52 arch.localdomain dockerd[325]: time="2023-08-26T16:28:52.077125536Z" level=warning msg="Not using native diff for overlay2, this may cause degraded performance for building images: kernel has CONFIG_OVERLAY_FS_REDIRECT_DIR enabled>
+# Aug 26 16:28:52 arch.localdomain dockerd[325]: time="2023-08-26T16:28:52.077265948Z" level=info msg="Docker daemon" commit=a61e2b4c9c graphdriver=overlay2 version=24.0.5
+# Aug 26 16:28:52 arch.localdomain dockerd[325]: time="2023-08-26T16:28:52.077320722Z" level=info msg="Daemon has completed initialization"
+# Aug 26 16:28:52 arch.localdomain dockerd[325]: time="2023-08-26T16:28:52.095832955Z" level=info msg="API listen on /run/docker.sock"
+# Aug 26 16:28:52 arch.localdomain systemd[1]: Started Docker Application Container Engine.
+
+
 sh("Verify Docker Engine works") { 'sudo docker run hello-world' }
