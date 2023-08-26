@@ -1,3 +1,7 @@
+imports:
+  core: core
+...
+
 core.pkg.update_repo!()
 
 puts "Install Docker Engine"
