@@ -2,7 +2,7 @@ imports:
   core: core
 ...
 
-case core.os()
+case core_os = core.os()
 in {base_os: /arch/}
   arch()
 in {base_os: /debian|ubuntu/}
@@ -10,5 +10,5 @@ in {base_os: /debian|ubuntu/}
 in {base_os: /fedora/}
   fedora()
 else
-  puts "unknown"
+  puts "Unable to install docker. Unknown OS: #{core_os.inspect}"
 end
