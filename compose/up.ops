@@ -1,0 +1,16 @@
+params:
+  compose_file: string    # this is the path to the docker-compose.yml file
+  detach: boolean?        # default: true
+  sudo: boolean?          # default: true
+...
+
+compose_file = params.compose_file
+detach = params.detach.boolean!(default: true)
+sudo = params.sudo.boolean!(default: true)
+
+desc "docker compose up #{compose_file}"
+success = sh? "{{ 'sudo ' if sudo }}docker compose -f {{ compose_file }} up{{ detach ? ' -d' : '' }}"
+
+{
+  success: success
+}
