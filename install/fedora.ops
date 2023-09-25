@@ -22,4 +22,9 @@ puts "Start docker"
 core.systemd.start(service: 'docker')
 core.systemd.enable(service: 'docker')
 
-sh("Verify Docker Engine works") { 'sudo docker run hello-world' }
+success = sh? 'Verify Docker Engine works',
+              'sudo docker run hello-world'
+
+{
+  success: success
+}

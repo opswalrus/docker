@@ -52,4 +52,9 @@ core.systemd.enable(service: 'docker')
 # Aug 26 16:28:52 arch.localdomain systemd[1]: Started Docker Application Container Engine.
 
 
-sh("Verify Docker Engine works") { 'sudo docker run hello-world' }
+success = sh? 'Verify Docker Engine works',
+              'sudo docker run hello-world'
+
+{
+  success: success
+}
